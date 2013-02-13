@@ -25,48 +25,42 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://download.java.net/maven/2/"
         //mavenRepo "http://repository.jboss.com/maven2/"
     }
-
-    def seleniumVersion = "2.21.0"
-    def gebVersion = "0.7.0"
-
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-        runtime "org.lesscss:lesscss:1.3.0"
+        runtime 'org.lesscss:lesscss:1.3.1'
 
-        test("org.gmock:gmock:0.8.2") {
+        test ("org.codehaus.geb:geb-spock:0.7.0") {
             export = false
         }
-        test("org.seleniumhq.selenium:selenium-htmlunit-driver:$seleniumVersion") {
-            export = false
-            exclude "xml-apis"
-        }
-        test("org.seleniumhq.selenium:selenium-chrome-driver:$seleniumVersion") {
+        test ('org.gmock:gmock:0.8.2') {
             export = false
         }
-        test("org.seleniumhq.selenium:selenium-firefox-driver:$seleniumVersion") {
-            export = false
-        }
-
-        // You usually only need one of these, but this project uses both
-        test("org.codehaus.geb:geb-spock:$gebVersion") {
+        test("org.seleniumhq.selenium:selenium-firefox-driver:2.28.0") {
+            exclude 'selenium-server'
             export = false
         }
     }
     plugins {
-        test(":spock:0.6") {
+        test (":spock:0.6") {
             export = false
         }
-        test(":geb:0.7.0") {
+        test (":geb:0.7.2") {
             export = false
         }
-        compile(":resources:1.1.6") {
+        compile (":resources:1.1.6") {
             export = false
         }
-        compile(":tomcat:$grailsVersion") {
+        compile (":hibernate:2.0.0") {
             export = false
         }
-        /*compile(":release:2.0.3") {
+        compile (":rest-client-builder:1.0.2") {
             export = false
-        }*/
+        }
+        compile (":tomcat:2.0.0") {
+            export = false
+        }
+//        build(':release:2.0.4', ':rest-client-builder:1.0.2') {
+//           export = false
+//        }
     }
 }
