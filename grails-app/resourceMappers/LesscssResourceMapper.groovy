@@ -25,7 +25,12 @@ class LesscssResourceMapper implements GrailsApplicationAware {
             lessCompiler.setCompress(grailsApplication.config.grails?.resources?.mappers?.lesscss?.compress == true ?: false)
         }
         File originalFile = resource.processedFile
-        File input = getOriginalFileSystemFile(resource.sourceUrl);
+        File input
+        try {
+          input = grailsApplication.parentContext.getResource(resource.sourceUrl).file
+        } catch (FileNotFoundException e) {
+          input = resource.originalResource.getFile()
+        }
         File target = new File(generateCompiledFileFromOriginal(originalFile.absolutePath))
 
         if (log.debugEnabled) {
@@ -50,9 +55,5 @@ class LesscssResourceMapper implements GrailsApplicationAware {
 
     private String generateCompiledFileFromOriginal(String original) {
          original + '.css'
-    }
-
-    private File getOriginalFileSystemFile(String sourcePath) {
-        grailsApplication.parentContext.getResource(sourcePath).file
     }
 }

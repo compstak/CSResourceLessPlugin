@@ -53,7 +53,7 @@ grails.project.dependency.resolution = {
         compile (":hibernate:2.2.0") {
             export = false
         }
-        compile (":rest-client-builder:1.0.2") {
+        compile (":rest-client-builder:1.0.3") {
             export = false
         }
         compile (":tomcat:2.2.0") {
@@ -62,5 +62,8 @@ grails.project.dependency.resolution = {
 //        build(':release:2.0.4', ':rest-client-builder:1.0.2') {
 //           export = false
 //        }
+        build(':release:2.2.1') {
+            export = false
+        }
     }
 }
