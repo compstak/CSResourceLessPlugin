@@ -37,7 +37,9 @@ class LesscssResourceMapper implements GrailsApplicationAware {
             log.debug "Compiling LESS file [${originalFile}] into [${target}], with compress [${grailsApplication.config.grails?.resources?.mappers?.lesscss?.compress}]"
         }
         try {
-            lessCompiler.compile input, target
+            if(!target.exists() || target.lastModified() <= input.lastModified()){
+                lessCompiler.compile input, target
+            }
             // Update mapping entry
             // We need to reference the new css file from now on
             resource.processedFile = target

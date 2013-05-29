@@ -1,3 +1,6 @@
+.idea/
+CSResourceLessPlugin.iml
+atlassian-ide-plugin.xml
 *.iws
 *Db.properties
 *Db.script
