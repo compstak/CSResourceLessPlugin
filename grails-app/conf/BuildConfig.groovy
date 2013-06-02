@@ -3,6 +3,12 @@ grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
 grails.release.scm.enabled = false
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
+
+grails.project.repos.compstak.url = "http://54.235.241.190:8081/nexus/content/repositories/grails-plugins-releases"
+grails.project.repos.compstak.username = System.getProperty("compstak.repo.username")
+grails.project.repos.compstak.password = System.getProperty("compstak.repo.password")
+grails.project.repos.default = "compstak"
+
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
     inherits("global") {
