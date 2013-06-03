@@ -1,4 +1,7 @@
+import grails.util.BuildSettings
+import grails.util.BuildSettingsHolder
 import org.grails.plugin.resource.mapper.MapperPhase
+import org.apache.commons.io.FileUtils
 
 /**
  * @author Paul Fairless
@@ -9,15 +12,34 @@ import org.codehaus.groovy.grails.plugins.support.aware.GrailsApplicationAware
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.lesscss.LessCompiler
 import org.lesscss.LessException
+import org.springframework.web.util.WebUtils
+import javax.servlet.ServletContext
 
 class LesscssResourceMapper implements GrailsApplicationAware {
 
     GrailsApplication grailsApplication
     LessCompiler lessCompiler
+    ServletContext servletContext
+    private File cacheDir
 
     def phase = MapperPhase.GENERATION // need to run early so that we don't miss out on all the good stuff
 
     static defaultIncludes = ['**/*.less']
+
+    File getCacheDir() {
+        if (!this.cacheDir) {
+            BuildSettings settings = BuildSettingsHolder.settings
+            if (settings) {
+                cacheDir = new File(settings.projectWorkDir, "resources-cache")
+            } else {
+                cacheDir = new File(WebUtils.getTempDir(servletContext), "resources-cache")
+            }
+            if (log.debugEnabled) {
+                log.debug("CacheDir: ${cacheDir.getAbsolutePath()}")
+            }
+        }
+        cacheDir
+    }
 
     def map(resource, config) {
         if(!lessCompiler) {
@@ -37,17 +59,15 @@ class LesscssResourceMapper implements GrailsApplicationAware {
             log.debug "Compiling LESS file [${originalFile}] into [${target}], with compress [${grailsApplication.config.grails?.resources?.mappers?.lesscss?.compress}]"
         }
         try {
-            String cachedFileName = originalFile.absolutePath.split('tomcat/work/Tomcat/localhost')[0] + 'cache' + resource.id.replaceAll(/(?i)\.less/, '.css')
-            File cacheBase = new File( cachedFileName.subSequence(0, cachedFileName.lastIndexOf('/') ) )
-            File cache = new File(cachedFileName)
+            File cache = new File(getCacheDir(), resource.id.replaceAll(/(?i)\.less/, '.css'))
 
-                if(!cache.exists() || cache.lastModified() <= input.lastModified()){
-                    lessCompiler.compile input, target
-                    cacheBase.mkdirs()
-                    cache.write(target.getText())
-                }else{
-                    target.write(cache.getText())
-                }
+            if(!cache.exists() || cache.lastModified() <= input.lastModified()){
+                lessCompiler.compile input, target
+                cache.getParentFile().mkdirs()
+                cache.write(target.getText())
+            }else{
+                FileUtils.copyFile(cache, target)
+            }
             // Update mapping entry
             // We need to reference the new css file from now on
             resource.processedFile = target
