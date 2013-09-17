@@ -42,6 +42,7 @@ class LesscssResourceMapper implements GrailsApplicationAware {
     }
 
     def map(resource, config) {
+        final boolean isCachingEnabled = config.cache?.enabled
         if(!lessCompiler) {
             lessCompiler = new LessCompiler()
             lessCompiler.setCompress(grailsApplication.config.grails?.resources?.mappers?.lesscss?.compress == true ?: false)
@@ -59,14 +60,18 @@ class LesscssResourceMapper implements GrailsApplicationAware {
             log.debug "Compiling LESS file [${originalFile}] into [${target}], with compress [${grailsApplication.config.grails?.resources?.mappers?.lesscss?.compress}]"
         }
         try {
-            File cache = new File(getCacheDir(), resource.id.replaceAll(/(?i)\.less/, '.css'))
+            if (isCachingEnabled) {
+               File cache = new File(getCacheDir(), resource.id.replaceAll(/(?i)\.less/, '.css'))
 
-            if(!cache.exists() || cache.lastModified() <= input.lastModified()){
-                lessCompiler.compile input, target
-                cache.getParentFile().mkdirs()
-                cache.write(target.getText())
-            }else{
-                FileUtils.copyFile(cache, target)
+               if(!cache.exists() || cache.lastModified() <= input.lastModified()){
+                   lessCompiler.compile input, target
+                   cache.getParentFile().mkdirs()
+                  cache.write(target.getText())
+               }else{
+                   FileUtils.copyFile(cache, target)
+               }
+            } else {
+                   lessCompiler.compile input, target
             }
             // Update mapping entry
             // We need to reference the new css file from now on

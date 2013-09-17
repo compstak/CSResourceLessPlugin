@@ -28,3 +28,5 @@ grails.resources.modules = {
 }
 grails.views.default.codec = "none" // none, html, base64
 grails.views.gsp.encoding = "UTF-8"
+
+grails.resources.mappers.lesscss.cache.enabled = true
